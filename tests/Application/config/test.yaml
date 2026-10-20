@@ -1,0 +1,8 @@
+opendxp:
+    documents:
+        type_definitions:
+            map:
+                fixture:
+                    class: \OpenDxp\Model\Document\Link
+                    valid_table: 'link'
+                    children_supported: false

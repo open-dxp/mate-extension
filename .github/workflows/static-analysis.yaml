@@ -1,0 +1,43 @@
+name: Static analysis
+
+on:
+    workflow_dispatch:
+    schedule:
+        -   cron: '0 3 * * 1,3,5'
+    push:
+        branches:
+            - "[0-9]+.[0-9]+"
+            - "[0-9]+.x"
+        paths-ignore:
+            - 'docs/**'
+    pull_request:
+        types: [ opened, synchronize, reopened ]
+        paths-ignore:
+            - 'docs/**'
+
+jobs:
+    setup-matrix:
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.matrix.outputs.matrix }}
+        steps:
+            -   uses: actions/checkout@v7
+
+            -   id: matrix
+                uses: open-dxp/workflows-collection-public/.github/actions/test-matrix@main
+                with:
+                    configuration: phpstan-configuration
+
+    static-analysis:
+        needs: setup-matrix
+        strategy:
+            matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+        uses: open-dxp/workflows-collection-public/.github/workflows/reusable-static-analysis.yaml@main
+        with:
+            php_version: ${{ matrix.matrix.php-version }}
+            experimental: ${{ matrix.matrix.experimental }}
+            opendxp_version: ${{ matrix.matrix.opendxp_version }}
+        secrets:
+            CLA_ACTION_ACCESS_TOKEN: ${{ secrets.CLA_ACTION_ACCESS_TOKEN }}
+            OPENDXP_INSTANCE_IDENTIFIER: ${{ secrets.OPENDXP_INSTANCE_IDENTIFIER }}
+            OPENDXP_ENCRYPTION_SECRET: ${{ secrets.OPENDXP_ENCRYPTION_SECRET }}

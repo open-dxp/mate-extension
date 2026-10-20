@@ -1,0 +1,90 @@
+# OpenDXP Mate Extension
+
+An AI agent that works on an OpenDXP project guesses twice. It guesses what the installation
+contains, and it guesses which mechanism of OpenDXP fits the task. Both guesses produce code that
+looks right and is wrong.
+
+This package is an extension for [Symfony AI Mate](https://symfony.com/doc/current/ai/components/mate.html).
+Its tools answer from the booted kernel of the installation: the bundles, the data model, the
+configuration, the document types and areabricks. Its skills tell the agent which mechanism fits a
+case and which tool to ask first.
+
+## Release Plan
+
+| Release | Supported OpenDXP Versions | Supported Symfony Versions | Release Date | Maintained     | Branch |
+|---------|----------------------------|----------------------------|--------------|----------------|--------|
+| **1.x** | `^1.5`                     | `^7.4`                     | 2026         | Feature Branch | 1.x    |
+
+> [!NOTE]
+> Mate is still on `0.x`. A minor release of Mate may change how extensions work, so a minor release here may follow it.
+
+## Installation
+
+```bash
+composer require --dev open-dxp/mate-extension
+vendor/bin/mate init
+```
+
+`mate init` asks how the agent runs Mate. 
+
+In a DDEV project the answer is `ddev exec vendor/bin/mate`. It writes `mate/`, `AGENTS.md` and a `CLAUDE.md` that imports it.
+After every `composer install` and `composer update`, Mate discovers the installed extensions again and installs their skills into `.agents/skills` and `.claude/skills`.
+
+The extension is for development only. Its tools boot the kernel and read the data model and the configuration. Install it with `--dev` and never deploy it.
+
+## Tools
+
+| Tool                   | Answers                                                                                                    |
+|------------------------|------------------------------------------------------------------------------------------------------------|
+| `opendxp_project`      | The core version, PHP, the environment, every bundle with version and enabled state.                       |
+| `opendxp_model_schema` | The data object classes with their fields, the relation field types, field collections, bricks and stores. |
+| `opendxp_site_config`  | Website settings with their references resolved, image thumbnails, sites and languages.                    |
+| `opendxp_documents`    | The document types with their capabilities and the areabricks with their templates.                        |
+| `opendxp_docs`         | Searches docs.opendxp.io and answers with the matching pages and an excerpt from each.                     |
+
+A tool runs like this:
+
+```bash
+vendor/bin/mate tools:call opendxp_model_schema --class=Product
+```
+
+`opendxp_docs` is the one tool that leaves the machine. It queries the search of the documentation
+site. Point it elsewhere in `mate/config.php`:
+
+```php
+$configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.com');
+```
+
+## Skills
+
+| Skill                   | Covers                                                                                        |
+|-------------------------|-----------------------------------------------------------------------------------------------|
+| `opendxp-dev`           | The entry point. Which tool answers what, and which skill covers a task.                      |
+| `opendxp-data-objects`  | Field collections, object bricks, classification stores, blocks and every relation type.      |
+| `opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
+| `opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
+
+## Adding to it from a bundle
+
+A bundle contributes its own tools and skills through the `extra.ai-mate` section of its
+`composer.json`. Mate discovers every installed package that has one:
+
+```json
+"extra": {
+    "ai-mate": {
+        "scan-dirs": ["src/Mate"],
+        "includes": ["config/mate.php"],
+        "skills": ["skills"]
+    }
+}
+```
+
+A tool of a bundle that needs the installation takes `OpenDxp\MateExtension\Kernel\HostKernel`
+and calls `boot()` before it reads anything.
+
+## License
+**DACHCOM.DIGITAL AG**, Löwenhofstrasse 15, 9424 Rheineck, Schweiz  
+[dachcom.com](https://www.dachcom.com), dcdi@dachcom.ch  
+Copyright © 2026 DACHCOM.DIGITAL. All rights reserved.  
+
+For licensing details please visit [LICENSE.md](LICENSE.md)

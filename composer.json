@@ -1,0 +1,70 @@
+{
+    "name": "open-dxp/mate-extension",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "description": "Symfony AI Mate extension for OpenDXP. Gives coding agents the facts of the installation and the skills to build on it.",
+    "keywords": [
+        "opendxp",
+        "mate",
+        "ai",
+        "agent"
+    ],
+    "homepage": "https://github.com/open-dxp/mate-extension",
+    "authors": [
+        {
+            "name": "DACHCOM.DIGITAL Stefan Hagspiel",
+            "email": "shagspiel@dachcom.ch",
+            "homepage": "https://www.dachcom.com/",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OpenDxp\\MateExtension\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OpenDxp\\MateExtension\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
+        "open-dxp/opendxp": "^1.5",
+        "symfony/ai-mate": "^0.14",
+        "symfony/dotenv": "^7.4",
+        "symfony/http-client": "^7.4"
+    },
+    "require-dev": {
+        "open-dxp/test-foundation": "^1.0",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "symfony/runtime": "^7.4"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-1.x": "1.0.x-dev"
+        },
+        "ai-mate": {
+            "scan-dirs": [
+                "src"
+            ],
+            "includes": [
+                "config/config.php"
+            ],
+            "instructions": "INSTRUCTIONS.md",
+            "skills": [
+                "skills"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "symfony/ai-mate-composer-plugin": true,
+            "symfony/runtime": true
+        }
+    }
+}
