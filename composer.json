@@ -46,16 +46,10 @@
             "dev-1.x": "1.0.x-dev"
         },
         "ai-mate": {
-            "scan-dirs": [
-                "src"
-            ],
-            "includes": [
-                "config/config.php"
-            ],
+            "scan-dirs": ["src"],
+            "includes": ["config/config.php"],
             "instructions": "INSTRUCTIONS.md",
-            "skills": [
-                "skills"
-            ]
+            "skills": ["skills"]
         }
     },
     "config": {

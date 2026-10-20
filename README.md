@@ -81,7 +81,7 @@ the `composer.json` of the bundle:
 
 The tools of a bundle are services of the application and get their dependencies from its
 container. The bundle registers them as public services when Mate is installed. The file in
-`includes` tells Mate to fetch each tool from the booted application:
+`includes` tells Mate to fetch each tool from the booted application. Mate reads only PHP files there:
 
 ```php
 $services->set(MyTool::class)
