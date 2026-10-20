@@ -64,10 +64,10 @@ $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.
 | `opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
 | `opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
 
-## Adding to it from a bundle
+## Tools and skills of a bundle
 
-A bundle contributes its own tools and skills through the `extra.ai-mate` section of its
-`composer.json`. Mate discovers every installed package that has one:
+A bundle ships its own tools and skills. Mate finds them through the `extra.ai-mate` section in
+the `composer.json` of the bundle:
 
 ```json
 "extra": {
@@ -79,8 +79,16 @@ A bundle contributes its own tools and skills through the `extra.ai-mate` sectio
 }
 ```
 
-A tool of a bundle that needs the installation takes `OpenDxp\MateExtension\Kernel\HostKernel`
-and calls `boot()` before it reads anything.
+The tools of a bundle are services of the application and get their dependencies from its
+container. The bundle registers them as public services when Mate is installed. The file in
+`includes` tells Mate to fetch each tool from the booted application:
+
+```php
+$services->set(MyTool::class)
+    ->factory([service(HostKernel::class), 'get'])
+    ->args([MyTool::class])
+    ->public();
+```
 
 ## License
 **DACHCOM.DIGITAL AG**, Löwenhofstrasse 15, 9424 Rheineck, Schweiz  
