@@ -20,17 +20,36 @@ case and which tool to ask first.
 
 ## Installation
 
+The extension is for development only. Its tools boot the kernel and read the data model and the
+configuration. Install it with `--dev` and never deploy it.
+
 ```bash
 composer require --dev open-dxp/mate-extension
 vendor/bin/mate init
 ```
 
-`mate init` asks how the agent runs Mate. 
+`mate init` asks which command your coding agent uses to run Mate.
 
-In a DDEV project the answer is `ddev exec vendor/bin/mate`. It writes `mate/`, `AGENTS.md` and a `CLAUDE.md` that imports it.
-After every `composer install` and `composer update`, Mate discovers the installed extensions again and installs their skills into `.agents/skills` and `.claude/skills`.
+### Running Mate in DDEV
 
-The extension is for development only. Its tools boot the kernel and read the data model and the configuration. Install it with `--dev` and never deploy it.
+Mate has to run in the container, next to the PHP and the database of the project. Run both
+commands through DDEV:
+
+```bash
+ddev composer require --dev open-dxp/mate-extension
+ddev exec vendor/bin/mate init
+```
+
+`mate init` finds the `.ddev` directory and suggests `ddev exec vendor/bin/mate` as the command for
+the agent. Keep it.
+
+### What Mate sets up
+
+`mate init` writes the directory `mate/`, an `AGENTS.md` and a `CLAUDE.md` that imports it. The
+`AGENTS.md` tells the agent which tools and skills exist and how to call them.
+
+After every `composer install` and `composer update`, Mate discovers the installed extensions again.
+It installs their skills into `.agents/skills` and `.claude/skills`, where the agent finds them.
 
 ## Tools
 
