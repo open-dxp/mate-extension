@@ -22,7 +22,9 @@ them instead of assuming them. Call the tools with the Mate command that `AGENTS
    Their names appear nowhere in the code.
 4. Call `opendxp_documents` before you build a document type or an areabrick. The one you need may
    already exist.
-5. Call `opendxp_docs` to search the documentation. Every hit carries the url of its markdown.
+5. Call `opendxp_docs` to search the documentation. It searches the released documentation. Pass
+   `--channel=next` when the project runs a development branch, which `opendxp_project` shows as a
+   version ending in `-dev`. Only hits from the released documentation carry the url of their markdown.
 
 Run `bin/console` with the same prefix you use for Mate. When the Symfony extension of Mate is
 installed, use `symfony-services` and `symfony-service-detail` instead of `debug:container`.

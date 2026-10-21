@@ -20,14 +20,17 @@ use Symfony\AI\Mate\Attribute\MateTool;
 use Symfony\AI\Mate\Encoding\ResponseEncoder;
 
 use function count;
+use function in_array;
 use function is_array;
 use function is_int;
 use function is_string;
+use function sprintf;
 use function trim;
 
 final readonly class DocsTool
 {
     private const int HITS = 8;
+    private const array CHANNELS = ['latest', 'next'];
 
     public function __construct(private DocumentationSearch $documentation)
     {
@@ -36,26 +39,31 @@ final readonly class DocsTool
     /**
      * @param string      $query   What to search for, e.g. "thumbnail definition" or "conditional logic".
      * @param string|null $section Narrow to one section. "core-framework" is the core itself. A bundle has the name its documentation shows, not the name of its composer package.
+     * @param string      $channel "latest" is the released documentation. "next" is the documentation of the development branches, for a project that runs one. Only hits from "latest" carry a markdown url.
      */
     #[MateTool(
         name: 'opendxp_docs',
         description: 'Searches the OpenDXP documentation and answers with the matching pages and an excerpt from each. Every result carries the url of the page and, where one exists, the url of its raw markdown.',
     )]
-    public function __invoke(string $query, ?string $section = null): string
+    public function __invoke(string $query, ?string $section = null, string $channel = 'latest'): string
     {
-        return ResponseEncoder::encodeUntrusted($this->search($query, $section));
+        return ResponseEncoder::encodeUntrusted($this->search($query, $section, $channel));
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function search(string $query, ?string $section): array
+    private function search(string $query, ?string $section, string $channel): array
     {
+        if (!in_array($channel, self::CHANNELS, true)) {
+            return ['error' => sprintf('There is no channel "%s". Use "latest" or "next".', $channel)];
+        }
+
         if (!$this->documentation->isAvailable()) {
             return ['error' => 'No documentation site is configured.'];
         }
 
-        $result = $this->documentation->search(trim($query), $section, self::HITS);
+        $result = $this->documentation->search(trim($query), $section, $channel, self::HITS);
 
         if (null === $result) {
             return ['error' => 'The documentation site did not answer.'];
@@ -75,6 +83,7 @@ final readonly class DocsTool
 
         return [
             'query'         => is_string($result['query'] ?? null) ? $result['query'] : $query,
+            'channel'       => $channel,
             'pages_matched' => is_int($total) ? $total : count($pages),
             'pages'         => $pages,
         ];

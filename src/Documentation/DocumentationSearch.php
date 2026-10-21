@@ -36,9 +36,9 @@ final readonly class DocumentationSearch
     /**
      * @return array<string, mixed>|null
      */
-    public function search(string $query, ?string $section, int $size): ?array
+    public function search(string $query, ?string $section, string $version, int $size): ?array
     {
-        $parameters = ['q' => $query, 'size' => (string) $size];
+        $parameters = ['q' => $query, 'version' => $version, 'size' => (string) $size];
 
         if (null !== $section && '' !== $section) {
             $parameters['section'] = $section;
