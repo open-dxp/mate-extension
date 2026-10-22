@@ -79,13 +79,13 @@ $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.
 
 ## Skills
 
-| Skill                   | Covers                                                                                        |
-|-------------------------|-----------------------------------------------------------------------------------------------|
-| `opendxp-dev`           | The entry point. Which tool answers what, and which skill covers a task.                      |
-| `opendxp-data-objects`  | Field collections, object bricks, classification stores, blocks and every relation type.      |
-| `opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
-| `opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
-| `opendxp-upgrade`       | What an update would bring, and the update itself through the migrations to the last check.   |
+| Skill                        | Covers                                                                                        |
+|------------------------------|-----------------------------------------------------------------------------------------------|
+| `mate-opendxp-dev`           | The entry point. Which tool answers what, and which skill covers a task.                      |
+| `mate-opendxp-data-objects`  | Field collections, object bricks, classification stores, blocks and every relation type.      |
+| `mate-opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
+| `mate-opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
+| `mate-opendxp-upgrade`       | What an update would bring, and the update itself through the migrations to the last check.   |
 
 ## Tools and skills of a bundle
 
@@ -101,6 +101,8 @@ the `composer.json` of the bundle:
     }
 }
 ```
+
+Mate installs a skill as `mate-<name>`, so refer to it by that name in instructions and other skills.
 
 The tools of a bundle are services of the application and get their dependencies from its
 container. The bundle registers them as public services when Mate is installed. The file in

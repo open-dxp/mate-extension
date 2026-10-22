@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.1
+- [BUGFIX] The instructions and the skills refer to the skills by their installed names, such as `mate-opendxp-dev`
+
 ## 1.0.0
 - [NEW FEATURE] Initial release
 - [NEW FEATURE] [HIGHLIGHT] `opendxp_update_options` lists the newer releases of the installed OpenDXP packages,

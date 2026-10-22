@@ -1,6 +1,6 @@
 ---
 name: opendxp-configuration
-description: Decide where a value lives that editors maintain in OpenDXP, and where configuration edited in the admin is stored. Use it for website settings, properties, asset metadata, thumbnails, document types, predefined properties and every config_location. Part of the opendxp-dev family.
+description: Decide where a value lives that editors maintain in OpenDXP, and where configuration edited in the admin is stored. Use it for website settings, properties, asset metadata, thumbnails, document types, predefined properties and every config_location. Part of the mate-opendxp-dev family.
 ---
 
 # Configuration

@@ -1,6 +1,6 @@
 ---
 name: opendxp-data-objects
-description: Model data objects in OpenDXP. Use it when you create or change a class, add a field, a relation, a field collection, an object brick, a classification store or a block, or when you load or filter data objects. Part of the opendxp-dev family.
+description: Model data objects in OpenDXP. Use it when you create or change a class, add a field, a relation, a field collection, an object brick, a classification store or a block, or when you load or filter data objects. Part of the mate-opendxp-dev family.
 ---
 
 # Data objects
