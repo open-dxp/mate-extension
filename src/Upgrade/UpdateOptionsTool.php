@@ -29,6 +29,7 @@ use function is_array;
 use function is_file;
 use function json_decode;
 use function ksort;
+use function sort;
 
 final readonly class UpdateOptionsTool
 {
@@ -61,11 +62,18 @@ final readonly class UpdateOptionsTool
         $constraints = $this->getRequiredConstraints();
         $options = [];
         $upToDate = [];
+        $fromBranch = [];
 
         foreach ($packages as $name => $releases) {
             $installed = InstalledVersions::isInstalled($name) ? (string) InstalledVersions::getVersion($name) : null;
 
-            if (null === $installed || 'dev' === VersionParser::parseStability($installed)) {
+            if (null === $installed) {
+                continue;
+            }
+
+            if ('dev' === VersionParser::parseStability($installed)) {
+                $fromBranch[] = $name;
+
                 continue;
             }
 
@@ -91,9 +99,13 @@ final readonly class UpdateOptionsTool
 
         ksort($options);
 
+        sort($upToDate);
+        sort($fromBranch);
+
         return [
-            'newer_releases' => $options,
-            'up_to_date'     => $upToDate,
+            'newer_releases'          => $options,
+            'up_to_date'              => $upToDate,
+            'installed_from_a_branch' => $fromBranch,
         ];
     }
 
