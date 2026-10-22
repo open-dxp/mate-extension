@@ -60,6 +60,7 @@ It installs their skills into `.agents/skills` and `.claude/skills`, where the a
 | `opendxp_site_config`  | Website settings with their references resolved, image thumbnails, sites and languages.                    |
 | `opendxp_documents`    | The document types with their capabilities and the areabricks with their templates.                        |
 | `opendxp_docs`         | Searches docs.opendxp.io and answers with the matching pages and an excerpt from each.                     |
+| `opendxp_upgrade_plan` | The update of every installed OpenDXP package: tasks, opt-in features, deprecations and migrations.        |
 
 A tool runs like this:
 
@@ -67,8 +68,9 @@ A tool runs like this:
 vendor/bin/mate tools:call opendxp_model_schema --class=Product
 ```
 
-`opendxp_docs` is the one tool that leaves the machine. It queries the search of the documentation
-site. Point it elsewhere in `mate/config.php`:
+`opendxp_docs` and `opendxp_upgrade_plan` leave the machine. They query the documentation site,
+which publishes the changelog of every package as `/releases.json`. Point them elsewhere in
+`mate/config.php`:
 
 ```php
 $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.com');
@@ -82,6 +84,7 @@ $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.
 | `opendxp-data-objects`  | Field collections, object bricks, classification stores, blocks and every relation type.      |
 | `opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
 | `opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
+| `opendxp-upgrade`       | The update of OpenDXP packages, from the plan through the migrations to the last check.       |
 
 ## Tools and skills of a bundle
 

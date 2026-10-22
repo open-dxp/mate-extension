@@ -21,6 +21,8 @@ use OpenDxp\MateExtension\Documentation\DocsTool;
 use OpenDxp\MateExtension\Documentation\DocumentationSearch;
 use OpenDxp\MateExtension\Kernel\HostKernel;
 use OpenDxp\MateExtension\Project\ProjectTool;
+use OpenDxp\MateExtension\Upgrade\ReleaseManifest;
+use OpenDxp\MateExtension\Upgrade\UpgradePlanTool;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -45,9 +47,16 @@ return static function (ContainerConfigurator $configurator): void {
             '%opendxp_mate.docs_url%',
         ]);
 
+    $services->set(ReleaseManifest::class)
+        ->args([
+            inline_service(HttpClientInterface::class)->factory([HttpClient::class, 'create']),
+            '%opendxp_mate.docs_url%',
+        ]);
+
     $services->set(ProjectTool::class);
     $services->set(ModelSchemaTool::class);
     $services->set(SiteConfigTool::class);
     $services->set(DocumentsTool::class);
     $services->set(DocsTool::class);
+    $services->set(UpgradePlanTool::class);
 };

@@ -36,3 +36,4 @@ installed, use `symfony-services` and `symfony-service-detail` instead of `debug
 | A class, its fields, a relation, a field collection or brick  | `opendxp-data-objects`  |
 | A page, a template, an editable, an areabrick, a document type | `opendxp-documents`     |
 | A value an editor maintains, or where configuration is stored | `opendxp-configuration` |
+| An update of the core or a bundle                             | `opendxp-upgrade`       |
