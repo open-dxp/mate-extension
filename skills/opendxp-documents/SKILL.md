@@ -1,6 +1,6 @@
 ---
 name: opendxp-documents
-description: Build pages in OpenDXP. Use it when you create a document type, a template, an editable, a block, an areablock or an areabrick, or when you decide how editors fill an area of a page. Part of the opendxp-dev family.
+description: Build pages in OpenDXP. Use it when you create a document type, a template, an editable, a block, an areablock or an areabrick, or when you decide how editors fill an area of a page. Part of the mate-opendxp-dev family.
 ---
 
 # Documents

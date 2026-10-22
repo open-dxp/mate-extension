@@ -31,9 +31,9 @@ installed, use `symfony-services` and `symfony-service-detail` instead of `debug
 
 ## Pick the skill for the task
 
-| Task                                                          | Skill                   |
-|---------------------------------------------------------------|-------------------------|
-| A class, its fields, a relation, a field collection or brick  | `opendxp-data-objects`  |
-| A page, a template, an editable, an areabrick, a document type | `opendxp-documents`     |
-| A value an editor maintains, or where configuration is stored | `opendxp-configuration` |
-| An update of the core or a bundle                             | `opendxp-upgrade`       |
+| Task                                                           | Skill                        |
+|----------------------------------------------------------------|------------------------------|
+| A class, its fields, a relation, a field collection or brick   | `mate-opendxp-data-objects`  |
+| A page, a template, an editable, an areabrick, a document type | `mate-opendxp-documents`     |
+| A value an editor maintains, or where configuration is stored  | `mate-opendxp-configuration` |
+| An update of the core or a bundle                              | `mate-opendxp-upgrade`       |
