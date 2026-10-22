@@ -19,207 +19,127 @@ namespace OpenDxp\MateExtension\Upgrade;
 use Composer\InstalledVersions;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
+use OpenDxp\MateExtension\Kernel\HostKernel;
 use Symfony\AI\Mate\Attribute\MateTool;
 use Symfony\AI\Mate\Encoding\ResponseEncoder;
+use Symfony\Component\Process\Process;
 
-use function array_filter;
-use function array_map;
-use function array_reverse;
-use function array_values;
-use function count;
-use function end;
-use function in_array;
 use function is_array;
 use function is_string;
+use function json_decode;
+use function ksort;
 use function sort;
 use function sprintf;
-use function usort;
 
 final readonly class UpgradePlanTool
 {
-    private const array CHANNELS = ['latest', 'next'];
-
-    public function __construct(private ReleaseManifest $manifest)
-    {
+    public function __construct(
+        private HostKernel $host,
+        private ReleaseManifest $manifest,
+    ) {
     }
 
     /**
-     * @param string|null $package A composer package such as "open-dxp/toolbox-bundle". Without it, the plan covers every installed OpenDXP package.
-     * @param string      $channel "latest" plans the update to the released versions. "next" adds the changes that are merged and not released yet, for a project that runs the development branches.
+     * @param string $from The commit whose composer.lock holds the versions from before the update.
      */
     #[MateTool(
         name: 'opendxp_upgrade_plan',
-        description: 'Plans the update of the installed OpenDXP packages from their changelogs. For each package it names the installed and the target version, the tasks every project does after the update, the opt-in features with their steps, the deprecations and the commands for the migrations. Every item is a changelog entry.',
+        description: 'Call it after composer update. It compares the composer.lock of a commit with the installed packages and lists, for every OpenDXP package that changed, the tasks after the update, the commands for the migrations, the deprecations and the opt-in features, all from the changelogs.',
     )]
-    public function __invoke(?string $package = null, string $channel = 'latest'): string
+    public function __invoke(string $from = 'HEAD'): string
     {
-        return ResponseEncoder::encodeUntrusted($this->plan($package, $channel));
+        return ResponseEncoder::encodeUntrusted($this->plan($from));
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function plan(?string $package, string $channel): array
+    private function plan(string $from): array
     {
-        if (!in_array($channel, self::CHANNELS, true)) {
-            return ['error' => sprintf('There is no channel "%s". Use "latest" or "next".', $channel)];
+        $before = $this->getLockedVersions($from);
+
+        if (null === $before) {
+            return ['error' => sprintf('The commit "%s" has no composer.lock. Pass the commit from before the update.', $from)];
         }
 
-        if (null !== $package && !InstalledVersions::isInstalled($package)) {
-            return ['error' => sprintf('The package "%s" is not installed.', $package)];
-        }
+        $packages = $this->manifest->getPackages();
 
-        $manifest = $this->manifest->load();
-
-        if (null === $manifest) {
+        if (null === $packages) {
             return ['error' => 'The documentation site did not answer with its release manifest.'];
         }
 
         $plans = [];
-        $upToDate = [];
         $fromBranch = [];
 
-        foreach ($this->getList($manifest['packages'] ?? null) as $release) {
-            $name = $release['package'] ?? null;
+        foreach ($packages as $name => $releases) {
+            $old = $before[$name] ?? null;
 
-            if (!is_string($name) || !InstalledVersions::isInstalled($name) || (null !== $package && $package !== $name)) {
+            if (null === $old || !InstalledVersions::isInstalled($name)) {
                 continue;
             }
 
-            $version = InstalledVersions::getPrettyVersion($name);
+            $new = (string) InstalledVersions::getVersion($name);
 
-            // A branch has no version to start from, so the changelog cannot tell what it already contains.
-            if (null === $version || 'dev' === VersionParser::parseStability($version)) {
-                $fromBranch[] = $name;
-
-                continue;
-            }
-
-            $versions = $this->getVersionsAfter($this->getList($release['versions'] ?? null), (string) InstalledVersions::getVersion($name), $channel);
-
-            if ([] === $versions) {
-                $upToDate[] = $name;
+            // A branch has no version, so the changelog cannot tell what the update brought.
+            if ('dev' === VersionParser::parseStability($old) || 'dev' === VersionParser::parseStability($new)) {
+                if ($old !== $new) {
+                    $fromBranch[] = $name;
+                }
 
                 continue;
             }
 
-            $plans[] = $this->describe($release, $name, $version, $versions, $channel);
+            if (!Comparator::greaterThan($new, $old)) {
+                continue;
+            }
+
+            $changes = Changes::fromVersions($releases->getVersionsBetween($old, $new));
+
+            $plans[$name] = [
+                'from'          => $old,
+                'to'            => InstalledVersions::getPrettyVersion($name),
+                'tasks'         => $changes->tasks,
+                'migrate'       => $changes->migrates ? $releases->getMigrateCommands() : [],
+                'deprecations'  => $changes->deprecations,
+                'offers'        => $changes->offers,
+                'other_changes' => $changes->others,
+                'changelog'     => $releases->changelog,
+            ];
         }
 
-        usort($plans, static fn (array $a, array $b): int => $a['package'] <=> $b['package']);
-        sort($upToDate);
+        ksort($plans);
         sort($fromBranch);
 
         return [
-            'channel'                 => $channel,
-            'packages'                => $plans,
-            'up_to_date'              => $upToDate,
-            'installed_from_a_branch' => $fromBranch,
+            'compared_with'         => $from,
+            'updated'               => $plans,
+            'updated_from_a_branch' => $fromBranch,
         ];
     }
 
     /**
-     * The manifest lists the newest version first. The plan takes them in the order they were released.
-     *
-     * @param list<array<string, mixed>> $versions
-     * @param string                     $installed The normalized version, as Composer stores it.
-     *
-     * @return list<array<string, mixed>>
+     * @return array<string, string>|null The normalized version of every locked package.
      */
-    private function getVersionsAfter(array $versions, string $installed, string $channel): array
+    private function getLockedVersions(string $commit): ?array
     {
-        $parser = new VersionParser();
-        $after = array_filter($versions, static function (array $version) use ($parser, $installed, $channel): bool {
-            if (null === ($version['released'] ?? null)) {
-                return 'next' === $channel;
-            }
+        $process = new Process(['git', 'show', sprintf('%s:composer.lock', $commit)], $this->host->getProjectDir());
+        $process->run();
 
-            return is_string($version['version'] ?? null) && Comparator::greaterThan($parser->normalize($version['version']), $installed);
-        });
+        $lock = $process->isSuccessful() ? json_decode($process->getOutput(), true) : null;
 
-        return array_reverse(array_values($after));
-    }
-
-    /**
-     * @param array<string, mixed>       $release
-     * @param list<array<string, mixed>> $versions
-     *
-     * @return array<string, mixed>
-     */
-    private function describe(array $release, string $name, string $installed, array $versions, string $channel): array
-    {
-        $tasks = [];
-        $offers = [];
-        $deprecations = [];
-        $others = 0;
-        $migrates = false;
-
-        foreach ($versions as $version) {
-            foreach ($this->getList($version['entries'] ?? null) as $entry) {
-
-                $type = $entry['type'] ?? null;
-                $markers = is_array($entry['markers'] ?? null) ? $entry['markers'] : [];
-
-                $item = [
-                    'version' => $version['version'] ?? null,
-                    'type'    => $type,
-                    'text'    => $entry['text'] ?? null,
-                    'steps'   => is_array($entry['steps'] ?? null) ? $entry['steps'] : [],
-                ];
-
-                $migrates = $migrates || in_array('MIGRATION', $markers, true);
-
-                if ('BC BREAK' === $type || in_array('FOLLOW-UP', $markers, true)) {
-                    $tasks[] = $item;
-                } elseif (in_array('OPT-IN', $markers, true)) {
-                    $offers[] = $item;
-                } elseif ('DEPRECATION' === $type) {
-                    $deprecations[] = $item;
-                } else {
-                    ++$others;
-                }
-            }
-        }
-
-        $target = end($versions);
-        $changelog = $release['changelog'][$channel] ?? null;
-
-        return [
-            'package'          => $name,
-            'installed'        => $installed,
-            'target'           => $target['version'] ?? null,
-            'requires_opendxp' => $target['requires'] ?? null,
-            'tasks'            => $tasks,
-            'offers'           => $offers,
-            'deprecations'     => $deprecations,
-            'migrate'          => $migrates ? $this->getMigrateCommands($release['migrations'] ?? null) : [],
-            'other_changes'    => $others,
-            'changelog'        => is_string($changelog) ? $this->manifest->getAbsoluteUrl($changelog) : null,
-        ];
-    }
-
-    /**
-     * @return list<string>|null
-     */
-    private function getMigrateCommands(mixed $namespaces): ?array
-    {
-        $namespaces = array_values(array_filter(is_array($namespaces) ? $namespaces : [], is_string(...)));
-
-        if (0 === count($namespaces)) {
+        if (!is_array($lock)) {
             return null;
         }
 
-        return array_map(
-            static fn (string $namespace): string => sprintf("bin/console doctrine:migrations:migrate --prefix '%s'", $namespace),
-            $namespaces,
-        );
-    }
+        $parser = new VersionParser();
+        $versions = [];
 
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function getList(mixed $value): array
-    {
-        return array_values(array_filter(is_array($value) ? $value : [], is_array(...)));
+        foreach ([...$lock['packages'] ?? [], ...$lock['packages-dev'] ?? []] as $package) {
+            if (is_array($package) && is_string($package['name'] ?? null) && is_string($package['version'] ?? null)) {
+                $versions[$package['name']] = $parser->normalize($package['version']);
+            }
+        }
+
+        return $versions;
     }
 }

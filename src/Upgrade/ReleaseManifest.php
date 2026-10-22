@@ -18,6 +18,9 @@ namespace OpenDxp\MateExtension\Upgrade;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
+
+use function is_array;
+use function is_string;
 use function rtrim;
 use function sprintf;
 
@@ -30,9 +33,36 @@ final readonly class ReleaseManifest
     }
 
     /**
+     * @return array<string, PackageReleases>|null
+     */
+    public function getPackages(): ?array
+    {
+        $manifest = $this->load();
+
+        if (null === $manifest) {
+            return null;
+        }
+
+        $packages = [];
+
+        foreach (is_array($manifest['packages'] ?? null) ? $manifest['packages'] : [] as $package) {
+            if (is_array($package) && is_string($package['package'] ?? null)) {
+                $changelog = $package['changelog']['latest'] ?? null;
+
+                $packages[$package['package']] = PackageReleases::fromManifest(
+                    $package,
+                    is_string($changelog) ? $this->getAbsoluteUrl($changelog) : null,
+                );
+            }
+        }
+
+        return $packages;
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
-    public function load(): ?array
+    private function load(): ?array
     {
         if (null === $this->baseUrl || '' === $this->baseUrl) {
             return null;
@@ -47,7 +77,7 @@ final readonly class ReleaseManifest
         }
     }
 
-    public function getAbsoluteUrl(string $path): string
+    private function getAbsoluteUrl(string $path): string
     {
         return sprintf('%s%s', rtrim((string) $this->baseUrl, '/'), $path);
     }

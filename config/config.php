@@ -22,6 +22,7 @@ use OpenDxp\MateExtension\Documentation\DocumentationSearch;
 use OpenDxp\MateExtension\Kernel\HostKernel;
 use OpenDxp\MateExtension\Project\ProjectTool;
 use OpenDxp\MateExtension\Upgrade\ReleaseManifest;
+use OpenDxp\MateExtension\Upgrade\UpdateOptionsTool;
 use OpenDxp\MateExtension\Upgrade\UpgradePlanTool;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpClient\HttpClient;
@@ -59,4 +60,5 @@ return static function (ContainerConfigurator $configurator): void {
     $services->set(DocumentsTool::class);
     $services->set(DocsTool::class);
     $services->set(UpgradePlanTool::class);
+    $services->set(UpdateOptionsTool::class);
 };
