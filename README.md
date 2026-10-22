@@ -53,13 +53,15 @@ It installs their skills into `.agents/skills` and `.claude/skills`, where the a
 
 ## Tools
 
-| Tool                   | Answers                                                                                                    |
-|------------------------|------------------------------------------------------------------------------------------------------------|
-| `opendxp_project`      | The core version, PHP, the environment, every bundle with version and enabled state.                       |
-| `opendxp_model_schema` | The data object classes with their fields, the relation field types, field collections, bricks and stores. |
-| `opendxp_site_config`  | Website settings with their references resolved, image thumbnails, sites and languages.                    |
-| `opendxp_documents`    | The document types with their capabilities and the areabricks with their templates.                        |
-| `opendxp_docs`         | Searches docs.opendxp.io and answers with the matching pages and an excerpt from each.                     |
+| Tool                     | Answers                                                                                                    |
+|--------------------------|------------------------------------------------------------------------------------------------------------|
+| `opendxp_project`        | The core version, PHP, the environment, every bundle with version and enabled state.                       |
+| `opendxp_model_schema`   | The data object classes with their fields, the relation field types, field collections, bricks and stores. |
+| `opendxp_site_config`    | Website settings with their references resolved, image thumbnails, sites and languages.                    |
+| `opendxp_documents`      | The document types with their capabilities and the areabricks with their templates.                        |
+| `opendxp_docs`           | Searches docs.opendxp.io and answers with the matching pages and an excerpt from each.                     |
+| `opendxp_update_options` | The newer releases of every OpenDXP package, within the constraint and beyond, with their highlights.      |
+| `opendxp_upgrade_plan`   | After `composer update`: the tasks, migrations, deprecations and opt-in features of every changed package. |
 
 A tool runs like this:
 
@@ -67,8 +69,9 @@ A tool runs like this:
 vendor/bin/mate tools:call opendxp_model_schema --class=Product
 ```
 
-`opendxp_docs` is the one tool that leaves the machine. It queries the search of the documentation
-site. Point it elsewhere in `mate/config.php`:
+`opendxp_docs`, `opendxp_update_options` and `opendxp_upgrade_plan` leave the machine. They
+query the documentation site, which publishes the changelog of every package as `/releases.json`.
+Point them elsewhere in `mate/config.php`:
 
 ```php
 $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.com');
@@ -82,6 +85,7 @@ $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.
 | `opendxp-data-objects`  | Field collections, object bricks, classification stores, blocks and every relation type.      |
 | `opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
 | `opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
+| `opendxp-upgrade`       | What an update would bring, and the update itself through the migrations to the last check.   |
 
 ## Tools and skills of a bundle
 

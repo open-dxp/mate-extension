@@ -30,10 +30,13 @@
     },
     "require": {
         "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
+        "composer-runtime-api": "^2.0",
+        "composer/semver": "^3.0",
         "open-dxp/opendxp": "^1.5",
         "symfony/ai-mate": "^0.14",
         "symfony/dotenv": "^7.4",
-        "symfony/http-client": "^7.4"
+        "symfony/http-client": "^7.4",
+        "symfony/process": "^7.4"
     },
     "require-dev": {
         "open-dxp/test-foundation": "^1.0",

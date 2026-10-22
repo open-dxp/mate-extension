@@ -11,3 +11,5 @@ write OpenDXP code. It says when to call which tool and which skill covers the t
 | `opendxp_site_config`      | Before you use a website setting, a thumbnail, a site or a language.                             |
 | `opendxp_documents`        | Before you build a document type or an areabrick. The installed ones with their capabilities.    |
 | `opendxp_docs`             | To search docs.opendxp.io. `--channel=next` searches the docs of the development branches.       |
+| `opendxp_update_options`   | When the developer asks which updates there are. Load the skill `opendxp-upgrade`.               |
+| `opendxp_upgrade_plan`     | After `composer update`. Load the skill `opendxp-upgrade` for the whole update.                  |
