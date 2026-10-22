@@ -20,6 +20,7 @@ Call `opendxp_update_options`. For every installed package with a newer release,
 
 Each comes with its highlights, the number of tasks, breaking changes and opt-in features on the way,
 whether it brings migrations, and the OpenDXP version it requires. Sum this up for the developer.
+A package under `installed_from_a_branch` follows its branch and has no release to compare.
 When they decide to update, go on with the next section.
 
 ## The developer asks to update

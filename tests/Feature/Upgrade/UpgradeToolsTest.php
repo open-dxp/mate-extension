@@ -140,6 +140,12 @@ it('offers the update within the constraint and the newest release beyond it', f
         ]);
 });
 
+it('names a package installed from a branch', function () {
+    $options = inProject(['open-dxp/toolbox-bundle' => 'dev-1.x'], [], [], static fn (HostKernel $host): string => (new UpdateOptionsTool($host, manifest()))());
+
+    expect($options['installed_from_a_branch'])->toBe(['open-dxp/toolbox-bundle']);
+});
+
 it('names a package that is up to date', function () {
     $options = inProject(['open-dxp/toolbox-bundle' => '2.0.0'], [], ['open-dxp/toolbox-bundle' => '^2.0'], static fn (HostKernel $host): string => (new UpdateOptionsTool($host, manifest()))());
 
