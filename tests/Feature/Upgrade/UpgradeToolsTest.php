@@ -45,7 +45,7 @@ function manifest(array $migrations = ['OpenDxp\Bundle\ToolboxBundle\Migrations'
 
 /**
  * Runs a tool in a project whose last commit locks the versions of $locked and whose vendor holds $installed.
- * The project lies in $applicationPath of the repository.
+ * $applicationPath places the project in a subdirectory of the repository.
  */
 function inProject(array $installed, array $locked, array $required, callable $run, string $applicationPath = ''): array
 {
