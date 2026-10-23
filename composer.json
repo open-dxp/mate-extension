@@ -33,7 +33,7 @@
         "composer-runtime-api": "^2.0",
         "composer/semver": "^3.0",
         "open-dxp/opendxp": "^1.5",
-        "symfony/ai-mate": "^0.14 || ^0.15",
+        "symfony/ai-mate": "^0.15",
         "symfony/dotenv": "^7.4",
         "symfony/http-client": "^7.4",
         "symfony/process": "^7.4"
