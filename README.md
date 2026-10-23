@@ -43,15 +43,15 @@ ddev exec vendor/bin/mate init
 `mate init` finds the `.ddev` directory and suggests `ddev exec vendor/bin/mate` as the command for
 the agent. Keep it.
 
-When `composer.json` lies in a subdirectory of the DDEV project, such as `backend/app`, run Mate in
-that directory:
+`ddev exec` starts in the root of the DDEV project. Some projects keep `composer.json` in a
+subdirectory, such as `backend/app`. Pass this directory with `--dir`:
 
 ```bash
 ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
 ```
 
-`mate init` does not find the `.ddev` directory then. Answer its question with
-`ddev exec --dir /var/www/html/backend/app vendor/bin/mate`.
+`mate init` looks for `.ddev` only next to `composer.json`. In such a project, it proposes
+`vendor/bin/mate`. Answer `ddev exec --dir /var/www/html/backend/app vendor/bin/mate` instead.
 
 ### What Mate sets up
 
