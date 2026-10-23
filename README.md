@@ -69,6 +69,20 @@ ddev composer exec -- mate
 `mate init` then warns that it cannot ask this command for its PHP version. Instead, it pins the PHP
 version of the container, which is the right one.
 
+### Running Mate with Docker Compose
+
+With Docker Compose, Mate runs in the service that runs PHP. In this example, the service is called
+`php`:
+
+```bash
+docker compose exec php composer require --dev open-dxp/mate-extension
+docker compose exec php vendor/bin/mate init
+```
+
+When `mate init` asks which command your agent should use to run Mate, answer
+`docker compose exec -T php vendor/bin/mate`. The `-T` is needed because your agent runs the command
+without a terminal.
+
 ### What Mate sets up
 
 `mate init` writes the directory `mate/`, an `AGENTS.md` and a `CLAUDE.md` that imports it. The
@@ -81,6 +95,16 @@ so an existing project may need to allow it first:
 
 ```bash
 composer config allow-plugins.symfony/ai-mate-composer-plugin true
+```
+
+### Symfony tools
+
+The [Symfony extension](https://symfony.com/doc/current/ai/components/mate.html) of Mate adds tools
+that read the container and the profiler, such as `symfony-services` and `symfony-profiler-list`.
+The skill `mate-opendxp-dev` uses them when they are installed. The extension is optional:
+
+```bash
+composer require --dev symfony/ai-symfony-mate-extension
 ```
 
 ## Tools
