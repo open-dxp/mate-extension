@@ -32,50 +32,52 @@ vendor/bin/mate init
 
 ### Running Mate in DDEV
 
-Mate has to run in the container, next to the PHP and the database of the project. Install the
-extension through DDEV:
+Mate has to run inside the container, next to the PHP and the database of the project, so you install
+the extension through DDEV:
 
 ```bash
 ddev composer require --dev open-dxp/mate-extension
 ```
 
-Then run `mate init` with one of these two commands:
+Then run `mate init` with either of these two commands:
 
 ```bash
 ddev exec vendor/bin/mate init
 ddev composer exec -- mate init
 ```
 
-`ddev exec` starts in the root of the DDEV project. Some projects keep `composer.json` in a
-subdirectory, such as `backend/app`. In such a project, pass this directory with `--dir`:
+`ddev exec` starts in the root of the DDEV project, so if your `composer.json` lives in a
+subdirectory such as `backend/app`, pass that directory with `--dir`:
 
 ```bash
 ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
 ```
 
-`ddev composer exec` always starts in the directory of `composer.json`. The `--` keeps Composer
-from reading the options of Mate as its own.
+`ddev composer exec` always starts in the directory of `composer.json`. The `--` keeps Composer from
+treating the options of Mate as its own.
 
-`mate init` asks which command the agent uses to run Mate. When `.ddev` lies next to
-`composer.json`, it proposes `ddev exec vendor/bin/mate`. Keep it. Otherwise it proposes
-`vendor/bin/mate`, which runs outside the container. Answer with one of these commands instead:
+When `mate init` asks which command your agent should use to run Mate, it suggests
+`ddev exec vendor/bin/mate` if `.ddev` sits next to `composer.json`, and you can keep that.
+Otherwise it suggests `vendor/bin/mate`, which would run outside the container, so answer with one
+of these commands instead:
 
 ```bash
 ddev exec --dir /var/www/html/backend/app vendor/bin/mate
 ddev composer exec -- mate
 ```
 
-`mate init` then warns that it cannot ask this command for its PHP version. It pins the PHP version
+`mate init` then warns that it cannot ask this command for its PHP version, and pins the PHP version
 of the container instead, which is the right one.
 
 ### What Mate sets up
 
 `mate init` writes the directory `mate/`, an `AGENTS.md` and a `CLAUDE.md` that imports it. The
-`AGENTS.md` tells the agent which tools and skills exist and how to call them.
+`AGENTS.md` tells your agent which tools and skills exist and how to call them.
 
-After every `composer install` and `composer update`, the Composer plugin of Mate runs
-`mate discover`. It finds new extensions and installs their skills into `.agents/skills` and
-`.claude/skills`, where the agent reads them. Composer runs the plugin only if the project allows it:
+Whenever you run `composer install` or `composer update`, the Mate Composer plugin runs
+`mate discover`, which picks up new extensions and installs their skills into `.agents/skills` and
+`.claude/skills`, where your agent finds them. Composer only runs plugins that the project allows,
+so an existing project may need to allow it first:
 
 ```bash
 composer config allow-plugins.symfony/ai-mate-composer-plugin true
