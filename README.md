@@ -57,7 +57,7 @@ ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
 treating the options of Mate as its own.
 
 When `mate init` asks which command your agent should use to run Mate, it suggests
-`ddev exec vendor/bin/mate` if `.ddev` sits next to `composer.json`, and you can keep that.
+`ddev exec vendor/bin/mate` if `.ddev` sits next to `composer.json`. You can keep this suggestion.
 Otherwise it suggests `vendor/bin/mate`, which would run outside the container, so answer with one
 of these commands instead:
 
@@ -66,8 +66,8 @@ ddev exec --dir /var/www/html/backend/app vendor/bin/mate
 ddev composer exec -- mate
 ```
 
-`mate init` then warns that it cannot ask this command for its PHP version, and pins the PHP version
-of the container instead, which is the right one.
+`mate init` then warns that it cannot ask this command for its PHP version. Instead, it pins the PHP
+version of the container, which is the right one.
 
 ### What Mate sets up
 
