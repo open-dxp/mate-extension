@@ -122,7 +122,7 @@ final readonly class UpgradePlanTool
      */
     private function getLockedVersions(string $commit): ?array
     {
-        $process = new Process(['git', 'show', sprintf('%s:composer.lock', $commit)], $this->host->getProjectDir());
+        $process = new Process(['git', 'show', sprintf('%s:./composer.lock', $commit)], $this->host->getProjectDir());
         $process->run();
 
         $lock = $process->isSuccessful() ? json_decode($process->getOutput(), true) : null;

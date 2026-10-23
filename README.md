@@ -43,13 +43,28 @@ ddev exec vendor/bin/mate init
 `mate init` finds the `.ddev` directory and suggests `ddev exec vendor/bin/mate` as the command for
 the agent. Keep it.
 
+When `composer.json` lies in a subdirectory of the DDEV project, such as `backend/app`, run Mate in
+that directory:
+
+```bash
+ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
+```
+
+`mate init` does not find the `.ddev` directory then. Answer its question with
+`ddev exec --dir /var/www/html/backend/app vendor/bin/mate`.
+
 ### What Mate sets up
 
 `mate init` writes the directory `mate/`, an `AGENTS.md` and a `CLAUDE.md` that imports it. The
 `AGENTS.md` tells the agent which tools and skills exist and how to call them.
 
-After every `composer install` and `composer update`, Mate discovers the installed extensions again.
-It installs their skills into `.agents/skills` and `.claude/skills`, where the agent finds them.
+After every `composer install` and `composer update`, the Composer plugin of Mate runs
+`mate discover`. It finds new extensions and installs their skills into `.agents/skills` and
+`.claude/skills`, where the agent reads them. Composer runs the plugin only if the project allows it:
+
+```bash
+composer config allow-plugins.symfony/ai-mate-composer-plugin true
+```
 
 ## Tools
 

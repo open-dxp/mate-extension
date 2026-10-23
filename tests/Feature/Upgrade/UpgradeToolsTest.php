@@ -45,10 +45,12 @@ function manifest(array $migrations = ['OpenDxp\Bundle\ToolboxBundle\Migrations'
 
 /**
  * Runs a tool in a project whose last commit locks the versions of $locked and whose vendor holds $installed.
+ * The project lies in $applicationPath of the repository.
  */
-function inProject(array $installed, array $locked, array $required, callable $run): array
+function inProject(array $installed, array $locked, array $required, callable $run, string $applicationPath = ''): array
 {
-    $projectDir = sys_get_temp_dir() . '/mate-upgrade-' . bin2hex(random_bytes(4));
+    $repositoryDir = sys_get_temp_dir() . '/mate-upgrade-' . bin2hex(random_bytes(4));
+    $projectDir = rtrim($repositoryDir . '/' . $applicationPath, '/');
     $filesystem = new Filesystem();
     $filesystem->dumpFile($projectDir . '/composer.json', json_encode(['require' => $required]));
     $filesystem->dumpFile($projectDir . '/composer.lock', json_encode([
@@ -56,7 +58,7 @@ function inProject(array $installed, array $locked, array $required, callable $r
     ]));
 
     foreach ([['init', '-q'], ['add', '.'], ['-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-q', '-m', 'lock']] as $arguments) {
-        (new Process(['git', ...$arguments], $projectDir))->mustRun();
+        (new Process(['git', ...$arguments], $repositoryDir))->mustRun();
     }
 
     $describe = static fn (string $version): array => [
@@ -79,7 +81,7 @@ function inProject(array $installed, array $locked, array $required, callable $r
         return ResponseEncoder::decode($run(new HostKernel($projectDir)))['untrusted_data'];
     } finally {
         InstalledVersions::reload($original);
-        $filesystem->remove($projectDir);
+        $filesystem->remove($repositoryDir);
     }
 }
 
@@ -95,6 +97,12 @@ it('plans the versions between the locked and the installed one', function () {
         ->and(array_column($plan['updated']['open-dxp/toolbox-bundle']['tasks'], 'steps'))->toBe([['Rebuild.'], ['Clear the cache.']])
         ->and($plan['updated']['open-dxp/toolbox-bundle']['offers'][0]['steps'])->toBe(['Enable it.'])
         ->and($plan['updated']['open-dxp/toolbox-bundle']['deprecations'])->toHaveCount(1);
+});
+
+it('reads the lock of a project in a subdirectory of the repository', function () {
+    $plan = inProject(['open-dxp/toolbox-bundle' => '1.1.0'], ['open-dxp/toolbox-bundle' => 'v1.0.0'], [], static fn (HostKernel $host): string => (new UpgradePlanTool($host, manifest()))(), 'backend/app');
+
+    expect($plan['updated']['open-dxp/toolbox-bundle']['to'])->toBe('1.1.0');
 });
 
 it('leaves out a package the update did not change', function () {
