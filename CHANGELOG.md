@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+- [BUGFIX] `opendxp_upgrade_plan` reads the `composer.lock` of a project in a subdirectory of the repository
+- [ENHANCEMENT] Requires `symfony/ai-mate` 0.15, whose Composer plugin runs `mate discover` after `composer install` and `composer update`
+
 ## 1.0.1
 - [BUGFIX] The instructions and the skills refer to the skills by their installed names, such as `mate-opendxp-dev`
 
