@@ -32,26 +32,41 @@ vendor/bin/mate init
 
 ### Running Mate in DDEV
 
-Mate has to run in the container, next to the PHP and the database of the project. Run both
-commands through DDEV:
+Mate has to run in the container, next to the PHP and the database of the project. Install the
+extension through DDEV:
 
 ```bash
 ddev composer require --dev open-dxp/mate-extension
-ddev exec vendor/bin/mate init
 ```
 
-`mate init` finds the `.ddev` directory and suggests `ddev exec vendor/bin/mate` as the command for
-the agent. Keep it.
+Then run `mate init` with one of these two commands:
+
+```bash
+ddev exec vendor/bin/mate init
+ddev composer exec -- mate init
+```
 
 `ddev exec` starts in the root of the DDEV project. Some projects keep `composer.json` in a
-subdirectory, such as `backend/app`. Pass this directory with `--dir`:
+subdirectory, such as `backend/app`. In such a project, pass this directory with `--dir`:
 
 ```bash
 ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
 ```
 
-`mate init` looks for `.ddev` only next to `composer.json`. In such a project, it proposes
-`vendor/bin/mate`. Answer `ddev exec --dir /var/www/html/backend/app vendor/bin/mate` instead.
+`ddev composer exec` always starts in the directory of `composer.json`. The `--` keeps Composer
+from reading the options of Mate as its own.
+
+`mate init` asks which command the agent uses to run Mate. When `.ddev` lies next to
+`composer.json`, it proposes `ddev exec vendor/bin/mate`. Keep it. Otherwise it proposes
+`vendor/bin/mate`, which runs outside the container. Answer with one of these commands instead:
+
+```bash
+ddev exec --dir /var/www/html/backend/app vendor/bin/mate
+ddev composer exec -- mate
+```
+
+`mate init` then warns that it cannot ask this command for its PHP version. It pins the PHP version
+of the container instead, which is the right one.
 
 ### What Mate sets up
 
