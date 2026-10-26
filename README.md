@@ -26,6 +26,7 @@ configuration. Install it with `--dev` and never deploy it.
 ```bash
 composer require --dev open-dxp/mate-extension
 vendor/bin/mate init
+vendor/bin/mate discover
 ```
 
 `mate init` asks which command your coding agent uses to run Mate.
@@ -56,6 +57,8 @@ ddev exec --dir /var/www/html/backend/app vendor/bin/mate init
 `ddev composer exec` always starts in the directory of `composer.json`. The `--` keeps Composer from
 treating the options of Mate as its own.
 
+Then run `mate discover` with the same command, for example `ddev composer exec -- mate discover`.
+
 When `mate init` asks which command your agent should use to run Mate, it suggests
 `ddev exec vendor/bin/mate` if `.ddev` sits next to `composer.json`. You can keep this suggestion.
 Otherwise it suggests `vendor/bin/mate`, which would run outside the container, so answer with one
@@ -77,6 +80,7 @@ With Docker Compose, Mate runs in the service that runs PHP. In this example, th
 ```bash
 docker compose exec php composer require --dev open-dxp/mate-extension
 docker compose exec php vendor/bin/mate init
+docker compose exec php vendor/bin/mate discover
 ```
 
 When `mate init` asks which command your agent should use to run Mate, answer
@@ -88,10 +92,13 @@ without a terminal.
 `mate init` writes the directory `mate/`, an `AGENTS.md` and a `CLAUDE.md` that imports it. The
 `AGENTS.md` tells your agent which tools and skills exist and how to call them.
 
-Whenever you run `composer install` or `composer update`, the Mate Composer plugin runs
-`mate discover`, which picks up new extensions and installs their skills into `.agents/skills` and
-`.claude/skills`, where your agent finds them. Composer only runs plugins that the project allows,
-so an existing project may need to allow it first:
+`mate discover` picks up the installed extensions and installs their skills into `.agents/skills`
+and `.claude/skills`, where your agent finds them. The Mate Composer plugin runs it after every
+`composer install` and `composer update`, but only once `mate init` has written `mate/`. That is why
+you run `mate discover` yourself right after `mate init`.
+
+Composer only runs plugins that the project allows, so an existing project may need to allow it
+first:
 
 ```bash
 composer config allow-plugins.symfony/ai-mate-composer-plugin true
