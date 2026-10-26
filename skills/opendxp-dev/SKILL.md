@@ -37,3 +37,4 @@ installed, use `symfony-services` and `symfony-service-detail` instead of `debug
 | A page, a template, an editable, an areabrick, a document type | `mate-opendxp-documents`     |
 | A value an editor maintains, or where configuration is stored  | `mate-opendxp-configuration` |
 | An update of the core or a bundle                              | `mate-opendxp-upgrade`       |
+| A test, a factory, a story or a helper of a test suite         | `mate-opendxp-tests`         |
