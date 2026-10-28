@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.4
+- [ENHANCEMENT] `mate-opendxp-contributing` covers the changelog entry, the commit and the pull request of a change to an OpenDXP package
+
 ## 1.0.3
 - [ENHANCEMENT] `mate-opendxp-dev` leads to `mate-opendxp-tests` for work on tests
 

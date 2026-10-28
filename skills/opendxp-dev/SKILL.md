@@ -38,3 +38,4 @@ installed, use `symfony-services` and `symfony-service-detail` instead of `debug
 | A value an editor maintains, or where configuration is stored  | `mate-opendxp-configuration` |
 | An update of the core or a bundle                              | `mate-opendxp-upgrade`       |
 | A test, a factory, a story or a helper of a test suite         | `mate-opendxp-tests`         |
+| A change to OpenDXP or a bundle itself, ready for review       | `mate-opendxp-contributing`  |

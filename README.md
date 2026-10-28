@@ -149,6 +149,7 @@ $configurator->parameters()->set('opendxp_mate.docs_url', 'https://docs.example.
 | `mate-opendxp-documents`     | Document types, editables, blocks, areablocks and areabricks.                                 |
 | `mate-opendxp-configuration` | Website settings, properties, asset metadata, and where admin-edited configuration is stored. |
 | `mate-opendxp-upgrade`       | What an update would bring, and the update itself through the migrations to the last check.   |
+| `mate-opendxp-contributing`  | The changelog entry, the commit and the pull request for a change to an OpenDXP package.      |
 
 ## Tools and skills of a bundle
 
