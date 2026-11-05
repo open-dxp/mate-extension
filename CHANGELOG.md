@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.6
+- [CHORE] Check dependencies, code and commits for security issues
+
 ## 1.0.5
 - [ENHANCEMENT] The extension accepts version 8.1 of `symfony/dotenv`, `symfony/http-client` and `symfony/process`
 
