@@ -10,7 +10,8 @@ a version or a count. Tell the developer only what they return, and add nothing 
 
 ## The developer asks what an update would bring
 
-Call `opendxp_update_options`. For every installed package with a newer release, it names:
+Call `opendxp_project` first. Every entry under `security_advisories` is a known vulnerability of an
+installed package. Name these first, with the version that fixes each. Then call `opendxp_update_options`. For every installed package with a newer release, it names:
 
 - `update`: the newest release the constraint in `composer.json` allows. `composer update` brings it.
   It is `null` when `composer.json` does not require the package itself. Then the packages that
@@ -41,5 +42,7 @@ When they decide to update, go on with the next section.
    with the deprecation rules, `bin/console debug:container --deprecations` and
    `bin/console lint:twig --show-deprecations`, and fix every message if possible.
 6. Run the tests of the project.
-7. Report which packages moved from which version to which, and what you did. List every entry under
+7. Call `opendxp_project` again. Every advisory under `security_advisories` that the update was
+   meant to fix must be gone.
+8. Report which packages moved from which version to which, and what you did. List every entry under
    `offers` with its steps. Enable an offer only when the developer asks for it.

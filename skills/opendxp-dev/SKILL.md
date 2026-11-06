@@ -15,7 +15,10 @@ Every installation differs: its version, its bundles, its classes and its config
 them instead of assuming them. Call the tools with the Mate command that `AGENTS.md` names.
 
 1. Call `opendxp_project` once per session. It names the core version and every OpenDXP bundle
-   with its version and whether the kernel has the bundle enabled.
+   with its version and whether the kernel has the bundle enabled. Under `security_advisories` it
+   names every known vulnerability of an installed package. Tell the developer about each one with
+   its severity, its link and the version that fixes it, before anything else. The full list of
+   advisories is always at https://docs.opendxp.io/security/advisories/.
 2. Call `opendxp_model_schema` before you read or write a data object. It names the classes and
    their fields. Never assume a field.
 3. Call `opendxp_site_config` before you use a website setting, a thumbnail, a site or a language.
