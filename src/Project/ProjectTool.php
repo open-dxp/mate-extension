@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace OpenDxp\MateExtension\Project;
 
 use OpenDxp\MateExtension\Kernel\HostKernel;
+use OpenDxp\MateExtension\Security\SecurityAdvisories;
 use Symfony\AI\Mate\Attribute\MateTool;
 use Symfony\AI\Mate\Encoding\ResponseEncoder;
 use function array_intersect;
@@ -34,13 +35,15 @@ final class ProjectTool
 
     private const string BUNDLE_TYPE = 'opendxp-bundle';
 
-    public function __construct(private readonly HostKernel $host)
-    {
+    public function __construct(
+        private readonly HostKernel $host,
+        private readonly SecurityAdvisories $advisories,
+    ) {
     }
 
     #[MateTool(
         name: 'opendxp_project',
-        description: 'What this OpenDXP installation is: the core version, the PHP version, the environment, and every installed OpenDXP bundle with its version and whether the kernel has it enabled. Call this once before you answer anything about the stack, instead of assuming a version from documentation.',
+        description: 'What this OpenDXP installation is: the core version, the PHP version, the environment, every installed OpenDXP bundle with its version and whether the kernel has it enabled, and the security advisories that affect an installed package. Call this once before you answer anything about the stack, instead of assuming a version from documentation.',
     )]
     public function __invoke(): string
     {
@@ -69,12 +72,16 @@ final class ProjectTool
         ksort($bundles);
 
         return ResponseEncoder::encode([
-            'opendxp' => [
+            'opendxp'             => [
                 'version'     => $packages[self::CORE_PACKAGE]['version'] ?? null,
                 'php'         => PHP_VERSION,
                 'environment' => $kernel->getEnvironment(),
             ],
-            'bundles' => $bundles,
+            'bundles'             => $bundles,
+            'security_advisories' => $this->advisories->findAffecting(array_map(
+                static fn (array $package): string => (string) ($package['version'] ?? ''),
+                $packages,
+            )) ?? ['error' => 'The documentation site did not answer with its security advisories.'],
         ]);
     }
 

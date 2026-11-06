@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.0.6
+- [NEW FEATURE] `opendxp_project` names the security advisories that affect an installed OpenDXP package, with the version that fixes each
 - [CHORE] Check dependencies, code and commits for security issues
 
 ## 1.0.5

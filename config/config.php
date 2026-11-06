@@ -21,6 +21,7 @@ use OpenDxp\MateExtension\Documentation\DocsTool;
 use OpenDxp\MateExtension\Documentation\DocumentationSearch;
 use OpenDxp\MateExtension\Kernel\HostKernel;
 use OpenDxp\MateExtension\Project\ProjectTool;
+use OpenDxp\MateExtension\Security\SecurityAdvisories;
 use OpenDxp\MateExtension\Upgrade\ReleaseManifest;
 use OpenDxp\MateExtension\Upgrade\UpdateOptionsTool;
 use OpenDxp\MateExtension\Upgrade\UpgradePlanTool;
@@ -49,6 +50,12 @@ return static function (ContainerConfigurator $configurator): void {
         ]);
 
     $services->set(ReleaseManifest::class)
+        ->args([
+            inline_service(HttpClientInterface::class)->factory([HttpClient::class, 'create']),
+            '%opendxp_mate.docs_url%',
+        ]);
+
+    $services->set(SecurityAdvisories::class)
         ->args([
             inline_service(HttpClientInterface::class)->factory([HttpClient::class, 'create']),
             '%opendxp_mate.docs_url%',
