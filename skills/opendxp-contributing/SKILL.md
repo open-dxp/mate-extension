@@ -16,13 +16,14 @@ The workflow `Changelog` checks the form of the file. The review checks the word
 `mate-opendxp-upgrade` builds the upgrade plan of every project from the changelogs. A missing
 marker leaves its step out of every plan.
 
-| The change                                                 | The entry                                     |
-|------------------------------------------------------------|-----------------------------------------------|
-| It brings a Doctrine migration                             | `[MIGRATION]`                                 |
-| A project has to run something after the update            | `[FOLLOW-UP]` with numbered steps             |
-| It stays off until a project turns it on                   | `[OPT-IN]` with numbered steps                |
-| A project changes something to keep the previous behaviour | `[OPT-IN]` with numbered steps                |
-| Existing code or configuration has to follow it            | `[BC BREAK]` with numbered steps, major only  |
+| The change                                                 | The entry                                      |
+|------------------------------------------------------------|------------------------------------------------|
+| It brings a Doctrine migration                             | `[MIGRATION]`                                  |
+| A project has to run something after the update            | `[FOLLOW-UP]` with numbered steps              |
+| It stays off until a project turns it on                   | `[OPT-IN]` with numbered steps                 |
+| A project changes something to keep the previous behaviour | `[OPT-IN]` with numbered steps                 |
+| Existing code or configuration has to follow it            | `[BC BREAK]` with numbered steps, major only   |
+| It closes a security vulnerability                         | `[SECURITY]`, the maintainers add its advisory |
 
 Check every migration of the branch for its `[MIGRATION]` entry before you hand it over.
 
