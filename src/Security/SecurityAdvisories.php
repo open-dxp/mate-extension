@@ -32,8 +32,6 @@ use function sprintf;
 
 final readonly class SecurityAdvisories
 {
-    private const int VERSION = 1;
-
     public function __construct(
         private HttpClientInterface $httpClient,
         private ?string $baseUrl,
@@ -44,7 +42,7 @@ final readonly class SecurityAdvisories
      * @param array<string, string> $installed The version of every installed package, by its name.
      *
      * @return list<array<string, mixed>>|null The advisories that affect an installed version, or null when the
-     *                                         documentation site does not answer with its feed.
+     *                                         feed cannot be read or a package in it has no name or affected range.
      */
     public function findAffecting(array $installed): ?array
     {
@@ -57,13 +55,27 @@ final readonly class SecurityAdvisories
         $affecting = [];
 
         foreach ($advisories as $advisory) {
+            if (!is_array($advisory['packages'] ?? null)) {
+                return null;
+            }
+
             $packages = [];
 
-            foreach (is_array($advisory['packages'] ?? null) ? $advisory['packages'] : [] as $package) {
-                $name = $package['name'] ?? null;
-                $version = is_string($name) ? $installed[$name] ?? null : null;
+            foreach ($advisory['packages'] as $package) {
+                if (!is_array($package)) {
+                    return null;
+                }
 
-                if (null === $version || !$this->isAffected($version, $package['affected'] ?? null)) {
+                $name = $package['name'] ?? null;
+                $affected = $package['affected'] ?? null;
+
+                if (!is_string($name) || !is_string($affected) || !$this->isRange($affected)) {
+                    return null;
+                }
+
+                $version = $installed[$name] ?? null;
+
+                if (null === $version || !$this->isAffected($version, $affected)) {
                     continue;
                 }
 
@@ -89,15 +101,26 @@ final readonly class SecurityAdvisories
         return $affecting;
     }
 
-    private function isAffected(string $version, mixed $affected): bool
+    private function isAffected(string $version, string $affected): bool
     {
         // A package installed from a branch has no version to compare.
-        if (!is_string($affected) || 'dev' === VersionParser::parseStability($version)) {
+        if ('dev' === VersionParser::parseStability($version)) {
             return false;
         }
 
         try {
             return Semver::satisfies($version, $affected);
+        } catch (UnexpectedValueException) {
+            return false;
+        }
+    }
+
+    private function isRange(string $affected): bool
+    {
+        try {
+            (new VersionParser())->parseConstraints($affected);
+
+            return true;
         } catch (UnexpectedValueException) {
             return false;
         }
@@ -133,7 +156,7 @@ final readonly class SecurityAdvisories
             return null;
         }
 
-        if (self::VERSION !== ($feed['version'] ?? null) || !is_array($feed['advisories'] ?? null)) {
+        if (!is_array($feed['advisories'] ?? null)) {
             return null;
         }
 
