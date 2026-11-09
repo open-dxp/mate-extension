@@ -14,7 +14,7 @@ function advisories(array $feed): SecurityAdvisories
     return new SecurityAdvisories(new MockHttpClient(new JsonMockResponse($feed)), 'https://docs.example.com');
 }
 
-$feed = ['version' => 1, 'advisories' => [[
+$feed = ['advisories' => [[
     'id'       => 'OPENDXP-SA-2026-007',
     'title'    => 'Workspaces opened paths outside their own folder',
     'severity' => 'medium',
@@ -47,11 +47,13 @@ it('leaves out a fixed version, a package of another branch line and a package i
     ]))->toBe([]);
 });
 
-it('returns null when the documentation site does not answer with a feed it knows', function (MockResponse $response) {
+it('returns null when the documentation site does not answer with a feed it can read', function (MockResponse $response) {
     $advisories = new SecurityAdvisories(new MockHttpClient($response), 'https://docs.example.com');
 
     expect($advisories->findAffecting(['open-dxp/opendxp' => '1.4.2']))->toBeNull();
 })->with([
-    'not found'     => fn () => new MockResponse('', ['http_code' => 404]),
-    'other version' => fn () => new JsonMockResponse(['version' => 2, 'advisories' => []]),
+    'not found'               => fn () => new MockResponse('', ['http_code' => 404]),
+    'no advisories'           => fn () => new JsonMockResponse(['items' => []]),
+    'a package without range' => fn () => new JsonMockResponse(['advisories' => [['packages' => [['name' => 'open-dxp/opendxp', 'range' => '< 1.5.0']]]]]),
+    'a range it cannot parse' => fn () => new JsonMockResponse(['advisories' => [['packages' => [['name' => 'open-dxp/opendxp', 'affected' => 'before 1.5']]]]]),
 ]);
